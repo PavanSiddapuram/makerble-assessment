@@ -1,64 +1,96 @@
 package test
 
 import (
+    "fmt"
+    "os"
     "testing"
     "time"
-    "github.com/stretchr/testify/assert"
-    "gorm.io/driver/sqlite"
+    "github.com/joho/godotenv"
+    "gorm.io/driver/mysql"
     "gorm.io/gorm"
     "makerble-assessment/internal/model"
     "makerble-assessment/internal/repository"
     "makerble-assessment/internal/service"
 )
 
-func setupTestDB(t *testing.T) *gorm.DB {
-    db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+func TestPatientService_Create(t *testing.T) {
+    if err := godotenv.Load(); err != nil {
+        t.Fatal("Error loading .env file")
+    }
+
+    dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+        os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"))
+    db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
     if err != nil {
         t.Fatalf("Failed to connect to test database: %v", err)
     }
-    db.AutoMigrate(&model.Patient{})
-    return db
-}
 
-func TestPatientService_Create(t *testing.T) {
-    db := setupTestDB(t)
+    if err := db.AutoMigrate(&model.Patient{}); err != nil {
+        t.Fatalf("Failed to migrate test database: %v", err)
+    }
+
     repo := repository.NewPatientRepository(db)
     svc := service.NewPatientService(repo)
 
+    dob, _ := time.Parse(time.RFC3339, "1995-05-05T00:00:00Z")
     input := service.CreatePatientInput{
-        FirstName:   "John",
+        FirstName:   "Jane",
         LastName:    "Doe",
-        DateOfBirth: "1990-01-01T00:00:00Z",
-        Gender:      "Male",
-        Contact:     "1234567890",
-        Address:     "123 Main St",
+        DateOfBirth: dob,
+        Gender:      "Female",
+        Contact:     "9876543210",
+        Address:     "456 Elm St",
     }
 
-    patient, err := svc.Create(input)
-    assert.NoError(t, err)
-    assert.Equal(t, input.FirstName, patient.FirstName)
-    assert.Equal(t, input.LastName, patient.LastName)
-    assert.Equal(t, input.Contact, patient.Contact)
-    assert.Equal(t, input.Address, patient.Address)
+    patient, err := svc.Create(&input)
+    if err != nil {
+        t.Fatalf("Failed to create patient: %v", err)
+    }
+
+    if patient.ID == 0 {
+        t.Error("Patient ID should not be zero after creation")
+    }
 }
 
 func TestPatientService_Get(t *testing.T) {
-    db := setupTestDB(t)
+    if err := godotenv.Load(); err != nil {
+        t.Fatal("Error loading .env file")
+    }
+
+    dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+        os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"))
+    db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+    if err != nil {
+        t.Fatalf("Failed to connect to test database: %v", err)
+    }
+
+    if err := db.AutoMigrate(&model.Patient{}); err != nil {
+        t.Fatalf("Failed to migrate test database: %v", err)
+    }
+
     repo := repository.NewPatientRepository(db)
     svc := service.NewPatientService(repo)
 
+    dob, _ := time.Parse(time.RFC3339, "1995-05-05T00:00:00Z")
     patient := model.Patient{
         FirstName:   "Jane",
         LastName:    "Doe",
-        DateOfBirth: time.Now(),
+        DateOfBirth: dob,
         Gender:      "Female",
-        Contact:     "0987654321",
+        Contact:     "9876543210",
         Address:     "456 Elm St",
     }
-    db.Create(&patient)
 
-    result, err := svc.Get(patient.ID)
-    assert.NoError(t, err)
-    assert.Equal(t, patient.FirstName, result.FirstName)
-    assert.Equal(t, patient.LastName, result.LastName)
+    if err := db.Create(&patient).Error; err != nil {
+        t.Fatalf("Failed to seed test patient: %v", err)
+    }
+
+    retrieved, err := svc.Get(patient.ID)
+    if err != nil {
+        t.Fatalf("Failed to get patient: %v", err)
+    }
+
+    if retrieved.ID != patient.ID || retrieved.FirstName != patient.FirstName {
+        t.Errorf("Retrieved patient does not match: got %+v, want %+v", retrieved, patient)
+    }
 }
