@@ -1,0 +1,369 @@
+basePath: /
+definitions:
+  service.CreatePatientInput:
+    properties:
+      address:
+        type: string
+      contact:
+        type: string
+      date_of_birth:
+        type: string
+      first_name:
+        type: string
+      gender:
+        enum:
+        - Male
+        - Female
+        - Other
+        type: string
+      last_name:
+        type: string
+    required:
+    - date_of_birth
+    - first_name
+    - gender
+    - last_name
+    type: object
+  service.LoginInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  service.MedicalHistoryInput:
+    properties:
+      medical_history:
+        type: string
+    required:
+    - medical_history
+    type: object
+  service.PatientResponse:
+    properties:
+      address:
+        type: string
+      contact:
+        type: string
+      date_of_birth:
+        type: string
+      first_name:
+        type: string
+      gender:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      medical_history:
+        type: string
+    type: object
+  service.UpdatePatientInput:
+    properties:
+      address:
+        type: string
+      contact:
+        type: string
+      date_of_birth:
+        type: string
+      first_name:
+        type: string
+      gender:
+        enum:
+        - Male
+        - Female
+        - Other
+        type: string
+      last_name:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Hospital management API for Makerble internship
+  title: Makerble Assessment API
+  version: "1.0"
+paths:
+  /api/doctor/patients:
+    get:
+      description: Get a list of patients
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/service.PatientResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List patients
+      tags:
+      - receptionist
+      - doctor
+  /api/doctor/patients/{id}:
+    get:
+      description: Get a patient by ID
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.PatientResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a patient
+      tags:
+      - receptionist
+      - doctor
+    put:
+      consumes:
+      - application/json
+      description: Update a patient's medical history (doctor only)
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Medical history
+        in: body
+        name: medical_history
+        required: true
+        schema:
+          $ref: '#/definitions/service.MedicalHistoryInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.PatientResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a patient's medical history
+      tags:
+      - doctor
+  /api/receptionist/patients:
+    get:
+      description: Get a list of patients
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/service.PatientResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List patients
+      tags:
+      - receptionist
+      - doctor
+    post:
+      consumes:
+      - application/json
+      description: Create a new patient (receptionist only)
+      parameters:
+      - description: Patient details
+        in: body
+        name: patient
+        required: true
+        schema:
+          $ref: '#/definitions/service.CreatePatientInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/service.PatientResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a patient
+      tags:
+      - receptionist
+  /api/receptionist/patients/{id}:
+    delete:
+      description: Delete a patient by ID (receptionist only)
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a patient
+      tags:
+      - receptionist
+    get:
+      description: Get a patient by ID
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.PatientResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a patient
+      tags:
+      - receptionist
+      - doctor
+    put:
+      consumes:
+      - application/json
+      description: Update a patient's details (receptionist only)
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Patient details
+        in: body
+        name: patient
+        required: true
+        schema:
+          $ref: '#/definitions/service.UpdatePatientInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.PatientResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a patient
+      tags:
+      - receptionist
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user and return a JWT token
+      parameters:
+      - description: User credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/service.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login a user
+      tags:
+      - auth
+swagger: "2.0"
