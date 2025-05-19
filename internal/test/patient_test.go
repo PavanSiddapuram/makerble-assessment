@@ -4,7 +4,7 @@ import (
     "fmt"
     "os"
     "testing"
-    "time"
+    "time" // Add time import
     "github.com/joho/godotenv"
     "gorm.io/driver/mysql"
     "gorm.io/gorm"
@@ -32,17 +32,16 @@ func TestPatientService_Create(t *testing.T) {
     repo := repository.NewPatientRepository(db)
     svc := service.NewPatientService(repo)
 
-    dob, _ := time.Parse(time.RFC3339, "1995-05-05T00:00:00Z")
     input := service.CreatePatientInput{
         FirstName:   "Jane",
         LastName:    "Doe",
-        DateOfBirth: dob,
+        DateOfBirth: "1995-05-05T00:00:00Z", // Use string
         Gender:      "Female",
         Contact:     "9876543210",
         Address:     "456 Elm St",
     }
 
-    patient, err := svc.Create(&input)
+    patient, err := svc.Create(input) // Pass input, not &input
     if err != nil {
         t.Fatalf("Failed to create patient: %v", err)
     }
