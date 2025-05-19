@@ -16,14 +16,17 @@ func AuthMiddleware(authService *service.AuthService, requiredRole string) gin.H
             return
         }
 
+        token := authHeader
         parts := strings.Split(authHeader, " ")
-        if len(parts) != 2 || parts[0] != "Bearer" {
+        if len(parts) == 2 && parts[0] == "Bearer" {
+            token = parts[1]
+        } else if len(parts) != 1 {
             c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid authorization header"})
             c.Abort()
             return
         }
 
-        claims, err := authService.ValidateToken(parts[1])
+        claims, err := authService.ValidateToken(token)
         if err != nil {
             c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
             c.Abort()

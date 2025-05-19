@@ -3,8 +3,8 @@ package main
 import (
     "log"
     "os"
-    "fmt"
     "github.com/joho/godotenv"
+    "golang.org/x/crypto/bcrypt"
     "gorm.io/driver/mysql"
     "gorm.io/gorm"
     "makerble-assessment/internal/model"
@@ -15,22 +15,25 @@ func main() {
         log.Fatal("Error loading .env file")
     }
 
-    host := os.Getenv("DB_HOST")
-    port := os.Getenv("DB_PORT")
-    user := os.Getenv("DB_USER")
-    password := os.Getenv("DB_PASSWORD")
-    dbname := os.Getenv("DB_NAME")
-
-    dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-        user, password, host, port, dbname)
+    dsn := os.Getenv("DB_USER") + ":" + os.Getenv("DB_PASSWORD") + "@tcp(" + os.Getenv("DB_HOST") + ":" + os.Getenv("DB_PORT") + ")/" + os.Getenv("DB_NAME") + "?charset=utf8mb4&parseTime=True&loc=Local"
     db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
     if err != nil {
-        log.Fatal("Failed to connect to database:", err)
+        log.Fatalf("Failed to connect to database: %v", err)
     }
 
     if err := db.AutoMigrate(&model.User{}, &model.Patient{}); err != nil {
-        log.Fatal("Failed to run migrations:", err)
+        log.Fatalf("Failed to migrate database: %v", err)
     }
 
-    fmt.Println("Database migration completed")
+    password, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
+    users := []model.User{
+        {Email: "recep@example.com", Password: string(password), Role: "receptionist"},
+        {Email: "doc@example.com", Password: string(password), Role: "doctor"},
+    }
+
+    for _, user := range users {
+        if err := db.FirstOrCreate(&user, model.User{Email: user.Email}).Error; err != nil {
+            log.Printf("Failed to create user %s: %v", user.Email, err)
+        }
+    }
 }

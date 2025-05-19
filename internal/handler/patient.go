@@ -16,14 +16,18 @@ func NewPatientHandler(service *service.PatientService) *PatientHandler {
 }
 
 // Create godoc
+// @Security BearerAuth
 // @Summary Create a patient
 // @Description Create a new patient (receptionist only)
 // @Tags receptionist
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer token"
 // @Param patient body service.CreatePatientInput true "Patient details"
 // @Success 201 {object} service.PatientResponse
 // @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Failure 403 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /api/receptionist/patients [post]
 func (h *PatientHandler) Create(c *gin.Context) {
@@ -43,11 +47,14 @@ func (h *PatientHandler) Create(c *gin.Context) {
 }
 
 // List godoc
+// @Security BearerAuth
 // @Summary List patients
 // @Description Get a list of patients
 // @Tags receptionist,doctor
 // @Produce json
+// @Param Authorization header string true "Bearer token"
 // @Success 200 {array} service.PatientResponse
+// @Failure 401 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /api/receptionist/patients [get]
 // @Router /api/doctor/patients [get]
@@ -62,13 +69,16 @@ func (h *PatientHandler) List(c *gin.Context) {
 }
 
 // Get godoc
+// @Security BearerAuth
 // @Summary Get a patient
 // @Description Get a patient by ID
 // @Tags receptionist,doctor
 // @Produce json
+// @Param Authorization header string true "Bearer token"
 // @Param id path int true "Patient ID"
 // @Success 200 {object} service.PatientResponse
 // @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Router /api/receptionist/patients/{id} [get]
 // @Router /api/doctor/patients/{id} [get]
@@ -89,15 +99,18 @@ func (h *PatientHandler) Get(c *gin.Context) {
 }
 
 // Update godoc
+// @Security BearerAuth
 // @Summary Update a patient
 // @Description Update a patient's details (receptionist only)
 // @Tags receptionist
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer token"
 // @Param id path int true "Patient ID"
 // @Param patient body service.UpdatePatientInput true "Patient details"
 // @Success 200 {object} service.PatientResponse
 // @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Router /api/receptionist/patients/{id} [put]
 func (h *PatientHandler) Update(c *gin.Context) {
@@ -123,13 +136,16 @@ func (h *PatientHandler) Update(c *gin.Context) {
 }
 
 // Delete godoc
+// @Security BearerAuth
 // @Summary Delete a patient
 // @Description Delete a patient by ID (receptionist only)
 // @Tags receptionist
 // @Produce json
+// @Param Authorization header string true "Bearer token"
 // @Param id path int true "Patient ID"
 // @Success 204
 // @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Router /api/receptionist/patients/{id} [delete]
 func (h *PatientHandler) Delete(c *gin.Context) {
@@ -148,15 +164,18 @@ func (h *PatientHandler) Delete(c *gin.Context) {
 }
 
 // UpdateMedicalHistory godoc
+// @Security BearerAuth
 // @Summary Update a patient's medical history
 // @Description Update a patient's medical history (doctor only)
 // @Tags doctor
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer token"
 // @Param id path int true "Patient ID"
 // @Param medical_history body service.MedicalHistoryInput true "Medical history"
 // @Success 200 {object} service.PatientResponse
 // @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Router /api/doctor/patients/{id} [put]
 func (h *PatientHandler) UpdateMedicalHistory(c *gin.Context) {

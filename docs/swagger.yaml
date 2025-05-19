@@ -89,6 +89,12 @@ paths:
   /api/doctor/patients:
     get:
       description: Get a list of patients
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -98,12 +104,20 @@ paths:
             items:
               $ref: '#/definitions/service.PatientResponse'
             type: array
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "500":
           description: Internal Server Error
           schema:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: List patients
       tags:
       - receptionist
@@ -112,6 +126,11 @@ paths:
     get:
       description: Get a patient by ID
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Patient ID
         in: path
         name: id
@@ -130,12 +149,20 @@ paths:
             additionalProperties:
               type: string
             type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "404":
           description: Not Found
           schema:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get a patient
       tags:
       - receptionist
@@ -145,6 +172,11 @@ paths:
       - application/json
       description: Update a patient's medical history (doctor only)
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Patient ID
         in: path
         name: id
@@ -169,18 +201,32 @@ paths:
             additionalProperties:
               type: string
             type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "404":
           description: Not Found
           schema:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update a patient's medical history
       tags:
       - doctor
   /api/receptionist/patients:
     get:
       description: Get a list of patients
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -190,12 +236,20 @@ paths:
             items:
               $ref: '#/definitions/service.PatientResponse'
             type: array
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "500":
           description: Internal Server Error
           schema:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: List patients
       tags:
       - receptionist
@@ -205,6 +259,11 @@ paths:
       - application/json
       description: Create a new patient (receptionist only)
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Patient details
         in: body
         name: patient
@@ -224,12 +283,26 @@ paths:
             additionalProperties:
               type: string
             type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "500":
           description: Internal Server Error
           schema:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a patient
       tags:
       - receptionist
@@ -237,6 +310,11 @@ paths:
     delete:
       description: Delete a patient by ID (receptionist only)
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Patient ID
         in: path
         name: id
@@ -253,18 +331,31 @@ paths:
             additionalProperties:
               type: string
             type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "404":
           description: Not Found
           schema:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete a patient
       tags:
       - receptionist
     get:
       description: Get a patient by ID
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Patient ID
         in: path
         name: id
@@ -283,12 +374,20 @@ paths:
             additionalProperties:
               type: string
             type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "404":
           description: Not Found
           schema:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get a patient
       tags:
       - receptionist
@@ -298,6 +397,11 @@ paths:
       - application/json
       description: Update a patient's details (receptionist only)
       parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Patient ID
         in: path
         name: id
@@ -322,12 +426,20 @@ paths:
             additionalProperties:
               type: string
             type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "404":
           description: Not Found
           schema:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update a patient
       tags:
       - receptionist
@@ -366,4 +478,9 @@ paths:
       summary: Login a user
       tags:
       - auth
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

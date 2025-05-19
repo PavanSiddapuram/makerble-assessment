@@ -20,6 +20,9 @@ import (
 // @description Hospital management API for Makerble internship
 // @host localhost:8080
 // @BasePath /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
     if err := godotenv.Load(); err != nil {
         log.Fatal("Error loading .env file")
